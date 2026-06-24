@@ -1,4 +1,3 @@
-require_relative "core/core"
 require_relative "engine/base"
 require_relative "engine/referee"
 require_relative "engine/pvp" # player vs player
@@ -8,21 +7,26 @@ require "colorize"
 # Main where the Player execute what to do next
 class Main
   def initialize
+    @pvp = Pvp::Match.new
     @check = GameRuling::Referee.new
     @board = LoadingBoard::Board.new
+    @current_mode = nil
   end
 
   def player_vs_player
+    @current_mode = :pvp
     @board.clearing
     @board.display
+    @pvp.start_game(@board, @check)
+    ask_again
   end
 
   def player_computer
+    @current_mode = :cvp
     loop do
       @board.clearing
       @board.display
 
-      # 1. Human Turn
       player1_turn
       if @check.check_win?(@board, "X")
         @board.clearing
@@ -32,15 +36,14 @@ class Main
         break
       end
 
-      # 2. Computer Turn
       Cvp::ComputerMove.new.execute_move(@board)
-      if @check.check_win?(@board, "O")
-        @board.clearing
-        @board.display
-        puts "Computer Wins!, You Lose.".colorize(:red)
-        ask_again
-        break
-      end
+      next unless @check.check_win?(@board, "O")
+
+      @board.clearing
+      @board.display
+      puts "Computer Wins!, You Lose.".colorize(:red)
+      ask_again
+      break
     end
   end
 
@@ -79,7 +82,7 @@ class Main
         puts "Slots Already Taken! Try Again.".colorize(:red)
       else
         @board.move_marker(pick, "X".colorize(:red))
-        break 
+        break
       end
     end
   end
@@ -91,14 +94,20 @@ class Main
     case n
     when "y"
       @board.reset
-      player_computer
+      if @current_mode == :pvp
+        player_vs_player
+      else
+        player_computer
+      end
     when "n"
+      @board.reset
       exit!
     when "c"
       @board.reset
       menu
     else
-      "Invalid choice! Try Again!"
+      puts "Invalid choice! Try Again!".colorize(:red)
+      ask_again
     end
   end
 end

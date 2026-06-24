@@ -9,7 +9,7 @@ module LoadingBoard
       display
     end
 
-    def reset 
+    def reset
       @grid = [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "]
     end
 
@@ -21,7 +21,7 @@ module LoadingBoard
       puts "#{@grid[6]} | #{@grid[7]} | #{@grid[8]}"
     end
 
-    def isAvailable?(position) # rubocop:todo Naming/MethodName
+    def isAvailable?(position)
       @grid[position].include?("X") || @grid[position].include?("O")
     end
 

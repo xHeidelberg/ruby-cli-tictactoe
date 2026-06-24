@@ -6,9 +6,7 @@ module Cvp
     def execute_move(current_board)
       n = "O"
       roll = rand(0..8)
-      while current_board.isAvailable?(roll) == true
-        roll = rand(0..8)
-      end
+      roll = rand(0..8) while current_board.isAvailable?(roll) == true
 
       current_board.move_marker(roll, n.colorize(:blue))
     end
